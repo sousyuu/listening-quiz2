@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>聴読解練習2</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+    background: #f0f2f8;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 16px 60px;
+  }
+  .card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 44px 40px 40px;
+    width: 100%;
+    max-width: 560px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  }
+  .page-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a2e;
+    text-align: center;
+    margin-bottom: 36px;
+    letter-spacing: 0.04em;
+  }
+  /* ---- Registration ---- */
+  .field { margin-bottom: 20px; }
+  .field label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+  }
+  .field label span { color: #e53e3e; margin-left: 2px; }
+  .field input {
+    width: 100%;
+    padding: 14px 18px;
+    font-size: 15px;
+    border: 2px solid #e2e6f0;
+    border-radius: 12px;
+    outline: none;
+    color: #1a1a2e;
+    transition: border-color 0.2s;
+    background: #fff;
+  }
+  .field input::placeholder { color: #b0b8cc; }
+  .field input:focus { border-color: #6b6ef9; }
+  /* ---- Buttons ---- */
+  .btn-primary {
+    width: 100%;
+    padding: 16px;
+    background: #6b6ef9;
+    color: #fff;
+    font-size: 17px;
+    font-weight: 700;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.2s, transform 0.1s;
+    letter-spacing: 0.06em;
+  }
+  .btn-primary:hover { background: #5558e8; }
+  .btn-primary:active { transform: scale(0.98); }
+  /* ---- Section Announce ---- */
+  .section-announce { text-align: center; padding: 20px 0 10px; }
+  .section-badge {
+    display: inline-block;
+    background: #eeeffe;
+    color: #6b6ef9;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 6px 18px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    letter-spacing: 0.08em;
+  }
+  .section-announce h2 {
+    font-size: 38px;
+    font-weight: 800;
+    color: #1a1a2e;
+    margin-bottom: 10px;
+    letter-spacing: 0.06em;
+  }
+  .section-announce p {
+    font-size: 15px;
+    color: #7a8099;
+    margin-bottom: 36px;
+    line-height: 1.6;
+  }
+  .section-announce .section-icon { font-size: 52px; margin-bottom: 20px; }
+  /* ---- Question ---- */
+  .question-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+    gap: 10px;
+  }
+  .q-badge {
+    background: #6b6ef9;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+    letter-spacing: 0.06em;
+  }
+  .q-progress {
+    flex: 1;
+    font-size: 13px;
+    color: #9aa0b8;
+    text-align: right;
+  }
+  /* Question images */
+  .question-images { margin-bottom: 20px; }
+  .question-image {
+    width: 100%;
+    border-radius: 12px;
+    border: 1px solid #eef0f8;
+    display: block;
+  }
+  .question-image + .question-image { margin-top: 10px; }
+
+  /* ---- Text options (選択肢が文字の場合) ---- */
+  .options-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+  .option-item { display: flex; align-items: center; }
+  .option-item input[type="radio"] { display: none; }
+  .option-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #e2e6f0;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    font-size: 14.5px;
+    color: #1a1a2e;
+    line-height: 1.55;
+  }
+  .option-label:hover { border-color: #6b6ef9; background: #f5f5ff; }
+  .option-item input[type="radio"]:checked + .option-label {
+    border-color: #6b6ef9;
+    background: #eeeffe;
+  }
+  .option-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+    border-radius: 50%;
+    background: #e2e6f0;
+    font-size: 13px;
+    font-weight: 700;
+    color: #6b6ef9;
+    transition: background 0.2s;
+  }
+  .option-item input[type="radio"]:checked + .option-label .option-number {
+    background: #6b6ef9;
+    color: #fff;
+  }
+
+  /* ---- Number buttons (選択肢が画像に含まれている場合) ---- */
+  .choice-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 28px;
+    justify-content: center;
+  }
+  .choice-item { flex: 1; max-width: 100px; }
+  .choice-item input[type="radio"] { display: none; }
+  .choice-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 60px;
+    border: 2.5px solid #e2e6f0;
+    border-radius: 14px;
+    cursor: pointer;
+    font-size: 24px;
+    font-weight: 800;
+    color: #6b6ef9;
+    background: #fafbff;
+    transition: border-color 0.2s, background 0.2s, color 0.2s, transform 0.1s;
+    user-select: none;
+  }
+  .choice-label:hover { border-color: #6b6ef9; background: #f0f0ff; }
+  .choice-item input[type="radio"]:checked + .choice-label {
+    border-color: #6b6ef9;
+    background: #6b6ef9;
+    color: #fff;
+    transform: scale(1.05);
+  }
+
+  /* ---- Nav ---- */
+  .nav-row { display: flex; gap: 10px; }
+  .btn-secondary {
+    flex: 1;
+    padding: 14px;
+    background: #f0f2f8;
+    color: #6b6ef9;
+    font-size: 15px;
+    font-weight: 700;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-secondary:hover { background: #e2e6f4; }
+  .btn-next {
+    flex: 2;
+    padding: 14px;
+    background: #6b6ef9;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+  .btn-next:hover { background: #5558e8; }
+  .btn-next:active { transform: scale(0.98); }
+  /* ---- Progress bar ---- */
+  .progress-bar-wrap {
+    background: #eef0f8;
+    border-radius: 8px;
+    height: 6px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #6b6ef9, #9b8cf9);
+    border-radius: 8px;
+    transition: width 0.4s ease;
+  }
+  /* ---- Submitting ---- */
+  .submitting-page { text-align: center; padding: 40px 0; }
+  .spinner {
+    width: 52px; height: 52px;
+    border: 5px solid #eeeffe;
+    border-top-color: #6b6ef9;
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+    margin: 0 auto 24px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .submitting-page h2 { font-size: 20px; font-weight: 700; color: #1a1a2e; margin-bottom: 8px; }
+  .submitting-page p  { font-size: 14px; color: #9aa0b8; }
+  /* ---- Complete ---- */
+  .complete-page { text-align: center; padding: 10px 0; }
+  .complete-page .check-icon { font-size: 56px; margin-bottom: 14px; }
+  .complete-page h2   { font-size: 24px; font-weight: 800; color: #1a1a2e; margin-bottom: 6px; }
+  .complete-page .subtitle { font-size: 14px; color: #7a8099; margin-bottom: 22px; }
+  .info-box {
+    background: #f5f7ff; border-radius: 12px; padding: 16px 20px;
+    margin-bottom: 18px; text-align: left; font-size: 14px; color: #444; line-height: 1.9;
+  }
+  .info-box strong { color: #6b6ef9; }
+  .score-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
+  .score-card { background: #f5f7ff; border-radius: 12px; padding: 14px 8px; text-align: center; }
+  .score-card .sc-label { font-size: 11px; font-weight: 700; color: #9aa0b8; margin-bottom: 4px; letter-spacing: 0.06em; }
+  .score-card .sc-val  { font-size: 22px; font-weight: 800; color: #6b6ef9; }
+  .score-card .sc-denom{ font-size: 13px; color: #9aa0b8; }
+  .score-total {
+    background: linear-gradient(135deg, #6b6ef9, #9b8cf9);
+    border-radius: 14px; padding: 18px; margin-bottom: 22px; color: #fff; text-align: center;
+  }
+  .score-total .st-label { font-size: 13px; font-weight: 600; opacity: 0.85; margin-bottom: 4px; }
+  .score-total .st-val  { font-size: 36px; font-weight: 800; }
+  .score-total .st-denom{ font-size: 18px; opacity: 0.8; }
+  .review-section { text-align: left; margin-bottom: 20px; }
+  .review-section .rv-title { font-size: 13px; font-weight: 700; color: #9aa0b8; margin-bottom: 8px; letter-spacing: 0.06em; }
+  .review-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 32px; height: 32px; padding: 0 8px; border-radius: 8px;
+    font-size: 13px; font-weight: 700;
+  }
+  .chip-correct { background: #e6f9ef; color: #27ae60; }
+  .chip-wrong   { background: #fdecea; color: #e53e3e; }
+  .error-banner {
+    background: #fdecea; border-radius: 12px; padding: 14px 16px;
+    margin-bottom: 18px; font-size: 14px; color: #c0392b; line-height: 1.6;
+  }
+  .error-msg  { color: #e53e3e; font-size: 13px; margin-top: 6px; display: none; }
+  .error-msg.show { display: block; }
+  .warn-msg { color: #dd6b20; font-size: 13px; margin-bottom: 12px; display: none; text-align: center; }
+  .warn-msg.show { display: block; }
+  @media (max-width: 480px) {
+    .card { padding: 32px 16px 28px; }
+    .page-title { font-size: 22px; }
+    .section-announce h2 { font-size: 28px; }
+    .choice-label { height: 52px; font-size: 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="card" id="app"></div>
+<script>
+// ===================== CONFIG =====================
+const GAS_URL = "https://script.google.com/macros/s/AKfycbyl5HedjheHsH_8OxjDj3H3J5DigerPY5xqbYul--Tl_hB_Sono5RVPe55Xr1eZMykdIw/exec";
+
+// ===================== 正解データ =====================
+const CORRECT_ANSWERS = [
+  [4, 3, 1, 1, 1],                       // セクション1 (5問)
+  [1, 1, 1, 4, 2, 1, 2, 1, 1, 2],        // セクション2 (10問)
+  [2, 2, 4, 3, 2, 2, 4, 2, 2, 4]         // セクション3 (10問)
+];
+
+// ===================== 問題データ =====================
+// images : 表示する画像（1枚 or 2枚）
+// options: 文字選択肢がある場合のみ設定。ない場合は 1/2/3/4 ボタンを表示。
+const SECTIONS = [
+  {
+    label: "セクション1",
+    icon: "📖",
+    description: "会話を聞いて、最も適切な答えを選んでください。",
+    questions: [
+      {
+        images: ["section1/1-1a.png"],
+        options: ["情報を共有してほしい。", "会議の準備を手伝ってほしい。", "アポイントメントを取ってほしい。", "取引先に同行してほしい。"]
+      },
+      {
+        images: ["section1/1-2a.png"],
+        options: ["売り上げ計画を再検討する。", "スケジュールを再調整する。", "企画書を練り直す。", "商品を開発する。"]
+      },
+      {
+        images: ["section1/1-3a.png"],
+        options: ["商品ディスプレイの図面", "新商品の宣伝ポスター案", "ホームページの表紙案", "社内セミナーの資料"]
+      },
+      {
+        images: ["section1/1-4a.png"],
+        options: ["予定を延ばすよう頼んでいる。", "期限の延長を断っている。", "頑張るように頼んでいる。", "予定のキャンセルを伝えている。"]
+      },
+      {
+        images: ["section1/1-5a.png"],
+        options: ["交渉決裂", "商談成立", "商談再検討", "価格見直し"]
+      }
+    ]
+  },
+  {
+    label: "セクション2",
+    icon: "🎧",
+    description: "資料を見ながら会話を聞いて、最も適切な答えを選んでください。",
+    questions: [
+      {
+        images: ["section2/2-1a.png"],
+        options: ["3つ", "5つ", "6つ", "9つ"]
+      },
+      {
+        images: ["section2/2-2a.png"],
+        options: ["自動車教習所", "英会話学校", "パソコン教室", "スポーツクラブ"]
+      },
+      {
+        images: ["section2/2-3a.png"],
+        options: [
+          "記入済みの申し込み用紙と15,000円を持って、11月10日までに総務課へ行く。",
+          "記入済みの申し込み用紙と20,000円を持って、11月10日までに総務課へ行く。",
+          "記入済みの申し込み用紙と15,000円を持って、12月27日に本社10階第2会議室へ行く。",
+          "記入済みの申し込み用紙と20,000円を持って、12月27日に本社10階第2会議室へ行く。"
+        ]
+      },
+      {
+        images: ["section2/2-4.png"],
+        options: ["人事関連", "海外事業部", "総務関連（交通費）", "総務関連（消耗品）"]
+      },
+      {
+        images: ["section2/2-5.png"],
+        options: ["新規販売先関係資料", "既存販売先関係資料", "子会社関係資料", "倒産先関係資料"]
+      },
+      {
+        images: ["section2/2-6a.png"],
+        options: ["A社", "B社", "C社", "D社"]
+      },
+      {
+        images: ["section2/2-7a.png"],
+        options: ["部長", "課長", "係長", "担当者"]
+      },
+      {
+        images: ["section2/2-8a.png"],
+        options: ["35,000円", "50,000円", "350,000円", "432,000円"]
+      },
+      {
+        images: ["section2/2-9.png"],
+        options: [
+          "田中（日本語母語・英語/中国語・コンサル8年・面接：よい）",
+          "李（中国語母語・英語/日本語・コンサル5年・面接：よい）",
+          "スミス（英語母語・スペイン語/日本語・コンサル1年・面接：とてもよい）",
+          "朴（韓国語母語・英語/フランス語・コンサル10年・面接：とてもよい）"
+        ]
+      },
+      {
+        images: ["section2/2-10.png"],
+        options: [
+          "フルカーゴ・センター（転居・建て替えなど、荷物が多い場合）",
+          "ライトカーゴ・センター（事業所・家庭の移転など小規模プラン）",
+          "ビジネスカーゴ・センター（事務所・店舗移転）",
+          "アートカーゴ・センター（美術品・貴重品・壊れ物など）"
+        ]
+      }
+    ]
+  },
+  {
+    label: "セクション3",
+    icon: "📝",
+    description: "資料を見ながら会話を聞いて、最も適切な答えを選んでください。",
+    questions: [
+      { images: ["section3/3-1.png"] },
+      { images: ["section3/3-2.png"] },
+      { images: ["section3/3-3.png"] },
+      {
+        images: ["section3/3-4.png"],
+        options: ["1人当たりの買い上げ金額", "来店者数", "売上金額の合計", "世代別人口"]
+      },
+      {
+        images: ["section3/3-5.png"],
+        options: [
+          "会社概要（HS建築とは－社史、組織、昨年度の業績）",
+          "社長講演（経営ビジョン、求める社員像について）",
+          "先輩からのメッセージ（仕事の説明と入社のきっかけ、やりがいについて）",
+          "募集要項の説明（応募方法について）／質疑応答"
+        ]
+      },
+      {
+        images: ["section3/3-6.png"],
+        options: [
+          "2日（火）見積もり確認・材料発注",
+          "5日（金）材料入荷",
+          "8日（月）作業開始",
+          "12日（金）完成・現場直納"
+        ]
+      },
+      {
+        images: ["section3/3-7.png"],
+        options: [
+          "15人・9月27日・6時",
+          "15人・9月10日・6時半",
+          "16人・9月10日・6時",
+          "16人・9月27日・6時半"
+        ]
+      },
+      {
+        images: ["section3/3-8.png"],
+        options: [
+          "山田様宛・図面他・4枚・NK設計事務所",
+          "山田様宛・図面他・5枚・NK設計事務所",
+          "川田部長宛・図面他・3枚・NK設計事務所",
+          "川田部長宛・図面他・5枚・NK設計事務所"
+        ]
+      },
+      {
+        images: ["section3/3-9.png"],
+        options: [
+          "第一生産部：損益率50%（前期比－3%）",
+          "第二生産部：損益率50%（前期比－4%）",
+          "第一マーケティング部：損益率60%（前期比－3%）",
+          "第二マーケティング部：損益率60%（前期比－3%）"
+        ]
+      },
+      {
+        images: ["section3/3-10a.png"],
+        options: ["①と④", "②と③", "①と③", "②と④"]
+      }
+    ]
+  }
+];
+
+// ===================== STATE =====================
+const state = {
+  screen: "register",
+  studentId: "",
+  name: "",
+  sectionIdx: 0,
+  questionIdx: 0,
+  answers: [[], [], []],
+  scoreResult: null,
+  submitError: false
+};
+
+// ===================== SCORE CALC =====================
+function calcScores(answers) {
+  return SECTIONS.map((sec, si) => {
+    const correct = CORRECT_ANSWERS[si];
+    const submitted = answers[si] || [];
+    return correct.reduce((sum, ans, qi) => sum + (submitted[qi] === ans ? 1 : 0), 0);
+  });
+}
+
+// ===================== RENDER =====================
+function render() {
+  const app = document.getElementById("app");
+  app.innerHTML = "";
+  switch (state.screen) {
+    case "register":   renderRegister(app);   break;
+    case "announce":   renderAnnounce(app);   break;
+    case "question":   renderQuestion(app);   break;
+    case "submitting": renderSubmitting(app); break;
+    case "complete":   renderComplete(app);   break;
+  }
+}
+
+// ---- Register ----
+function renderRegister(app) {
+  app.innerHTML = `
+    <h1 class="page-title">聴読解練習2</h1>
+    <div class="field">
+      <label>学号 <span>*</span></label>
+      <input type="text" id="inp-id" placeholder="学号を入力してください" value="${escHtml(state.studentId)}">
+      <div class="error-msg" id="err-id">学号を入力してください。</div>
+    </div>
+    <div class="field">
+      <label>姓名 <span>*</span></label>
+      <input type="text" id="inp-name" placeholder="姓名を入力してください" value="${escHtml(state.name)}">
+      <div class="error-msg" id="err-name">姓名を入力してください。</div>
+    </div>
+    <button class="btn-primary" id="btn-start">開始測驗</button>
+  `;
+  document.getElementById("btn-start").onclick = () => {
+    const id   = document.getElementById("inp-id").value.trim();
+    const name = document.getElementById("inp-name").value.trim();
+    let ok = true;
+    if (!id)   { document.getElementById("err-id").classList.add("show");   ok = false; }
+    else         document.getElementById("err-id").classList.remove("show");
+    if (!name) { document.getElementById("err-name").classList.add("show"); ok = false; }
+    else         document.getElementById("err-name").classList.remove("show");
+    if (!ok) return;
+    state.studentId = id;
+    state.name = name;
+    state.sectionIdx = 0;
+    state.answers = [[], [], []];
+    state.screen = "announce";
+    render();
+  };
+  ["inp-id","inp-name"].forEach(id => {
+    document.getElementById(id).addEventListener("input", e => {
+      const errId = id === "inp-id" ? "err-id" : "err-name";
+      if (e.target.value.trim()) document.getElementById(errId).classList.remove("show");
+    });
+  });
+}
+
+// ---- Announce ----
+function renderAnnounce(app) {
+  const sec = SECTIONS[state.sectionIdx];
+  app.innerHTML = `
+    <div class="section-announce">
+      <div class="section-badge">${sec.label}</div>
+      <div class="section-icon">${sec.icon}</div>
+      <h2>${sec.label}</h2>
+      <p>${sec.description}<br>全 <strong>${sec.questions.length}</strong> 問</p>
+      <button class="btn-primary" id="btn-go">はじめる →</button>
+    </div>
+  `;
+  document.getElementById("btn-go").onclick = () => {
+    state.questionIdx = 0;
+    state.screen = "question";
+    render();
+  };
+}
+
+// ---- Question ----
+function renderQuestion(app) {
+  const sec    = SECTIONS[state.sectionIdx];
+  const q      = sec.questions[state.questionIdx];
+  const totalQ = sec.questions.length;
+  const globalTotal = SECTIONS.reduce((s, s2) => s + s2.questions.length, 0);
+  const globalDone  = SECTIONS.slice(0, state.sectionIdx).reduce((s, s2) => s + s2.questions.length, 0) + state.questionIdx;
+  const pct    = Math.round((globalDone / globalTotal) * 100);
+  const saved  = state.answers[state.sectionIdx][state.questionIdx];
+  const isLastQ   = state.questionIdx === totalQ - 1;
+  const isLastSec = state.sectionIdx  === SECTIONS.length - 1;
+  const canGoBack = state.questionIdx > 0 || state.sectionIdx > 0;
+  const nextLabel = (isLastQ && isLastSec) ? "提出する ✓" : "次へ →";
+
+  // 画像
+  const imagesHtml = q.images.map(src =>
+    `<img class="question-image" src="${src}" alt="問題画像" onerror="this.style.display='none'">`
+  ).join("");
+
+  // 選択肢：文字 or 数字ボタン
+  let answerHtml = "";
+  if (q.options) {
+    // 文字選択肢（リスト形式）
+    const optionsHtml = q.options.map((opt, i) => {
+      const val = i + 1;
+      const checked = saved === val ? "checked" : "";
+      return `
+        <li class="option-item">
+          <input type="radio" name="q" id="opt${val}" value="${val}" ${checked}>
+          <label class="option-label" for="opt${val}">
+            <span class="option-number">${val}</span>
+            <span>${escHtml(opt)}</span>
+          </label>
+        </li>`;
+    }).join("");
+    answerHtml = `<ul class="options-list">${optionsHtml}</ul>`;
+  } else {
+    // 画像に選択肢が含まれる → 数字ボタン
+    const choicesHtml = [1, 2, 3, 4].map(val => {
+      const checked = saved === val ? "checked" : "";
+      return `
+        <div class="choice-item">
+          <input type="radio" name="q" id="c${val}" value="${val}" ${checked}>
+          <label class="choice-label" for="c${val}">${val}</label>
+        </div>`;
+    }).join("");
+    answerHtml = `<div class="choice-row">${choicesHtml}</div>`;
+  }
+
+  app.innerHTML = `
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" style="width:${pct}%"></div>
+    </div>
+    <div class="question-header">
+      <span class="q-badge">${sec.label} 第${state.questionIdx + 1}問</span>
+      <span class="q-progress">${state.questionIdx + 1} / ${totalQ}</span>
+    </div>
+    <div class="question-images">${imagesHtml}</div>
+    ${answerHtml}
+    <div class="warn-msg" id="warn">回答を選択してください。</div>
+    <div class="nav-row">
+      ${canGoBack ? `<button class="btn-secondary" id="btn-back">← 戻る</button>` : ""}
+      <button class="btn-next" id="btn-next" style="${!canGoBack ? "flex:1" : ""}">${nextLabel}</button>
+    </div>
+  `;
+
+  if (canGoBack) {
+    document.getElementById("btn-back").onclick = () => {
+      if (state.questionIdx > 0) {
+        state.questionIdx--;
+      } else {
+        state.sectionIdx--;
+        state.questionIdx = SECTIONS[state.sectionIdx].questions.length - 1;
+      }
+      render();
+    };
+  }
+
+  document.getElementById("btn-next").onclick = () => {
+    const chosen = document.querySelector("input[name='q']:checked");
+    if (!chosen) { document.getElementById("warn").classList.add("show"); return; }
+    state.answers[state.sectionIdx][state.questionIdx] = parseInt(chosen.value);
+    if (isLastQ && isLastSec) {
+      submitAnswers();
+    } else if (isLastQ) {
+      state.sectionIdx++;
+      state.questionIdx = 0;
+      state.screen = "announce";
+      render();
+    } else {
+      state.questionIdx++;
+      render();
+    }
+  };
+
+  document.querySelectorAll("input[name='q']").forEach(r => {
+    r.addEventListener("change", () => document.getElementById("warn").classList.remove("show"));
+  });
+}
+
+// ---- Submit to GAS ----
+// hidden iframe（form POST）を使用 → file://・どのブラウザでも動作
+function submitAnswers() {
+  state.screen = "submitting";
+  render();
+
+  const scores = calcScores(state.answers);
+  state.scoreResult = scores;
+
+  const payload = {
+    studentId: state.studentId,
+    name: state.name,
+    answers: state.answers,
+    scores: scores,
+    submittedAt: new Date().toISOString()
+  };
+
+  // hidden iframe + form POST（CORS制限なし、file://でも動作）
+  try {
+    let iframe = document.getElementById("_gas_frame");
+    if (!iframe) {
+      iframe = document.createElement("iframe");
+      iframe.id = "_gas_frame";
+      iframe.name = "_gas_frame";
+      iframe.style.display = "none";
+      document.body.appendChild(iframe);
+    }
+
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = GAS_URL;
+    form.target = "_gas_frame";
+    form.style.display = "none";
+
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = "payload";
+    input.value = JSON.stringify(payload);
+    form.appendChild(input);
+
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
+
+    state.submitError = false;
+  } catch (err) {
+    console.error("送信エラー:", err);
+    state.submitError = true;
+  }
+
+  // 送信は非同期のため少し待ってから結果画面へ
+  setTimeout(() => {
+    state.screen = "complete";
+    render();
+  }, 1200);
+}
+
+// ---- Submitting ----
+function renderSubmitting(app) {
+  app.innerHTML = `
+    <div class="submitting-page">
+      <div class="spinner"></div>
+      <h2>送信中...</h2>
+      <p>しばらくお待ちください</p>
+    </div>
+  `;
+}
+
+// ---- Complete ----
+function renderComplete(app) {
+  const scores = state.scoreResult || calcScores(state.answers);
+  const maxes  = [5, 10, 10];
+  const total  = scores.reduce((a, b) => a + b, 0);
+
+  const scoreGrid = SECTIONS.map((sec, si) => `
+    <div class="score-card">
+      <div class="sc-label">${sec.label}</div>
+      <div class="sc-val">${scores[si]}<span class="sc-denom">/${maxes[si]}</span></div>
+    </div>
+  `).join("");
+
+  const reviewSections = SECTIONS.map((sec, si) => {
+    const chips = sec.questions.map((_, qi) => {
+      const submitted = state.answers[si][qi];
+      const correct   = CORRECT_ANSWERS[si][qi];
+      const isOk = submitted === correct;
+      return `<span class="${isOk ? "chip chip-correct" : "chip chip-wrong"}" title="正解:${correct}">${submitted || "?"}</span>`;
+    }).join("");
+    return `
+      <div class="review-section">
+        <div class="rv-title">${sec.label}</div>
+        <div class="review-chips">${chips}</div>
+      </div>`;
+  }).join("");
+
+  const statusBanner = state.submitError
+    ? `<div class="error-banner">⚠️ Google Sheets への送信に失敗しました。<br>ネットワーク接続またはGAS URLをご確認ください。<br>スコアはこの画面でご確認いただけます。</div>`
+    : `<div style="background:#e6f9ef;border-radius:12px;padding:12px 16px;margin-bottom:18px;font-size:13px;color:#27ae60;font-weight:600;">✅ Google Sheets への送信が完了しました</div>`;
+
+  app.innerHTML = `
+    <div class="complete-page">
+      <div class="check-icon">🎉</div>
+      <h2>テスト完了！</h2>
+      <p class="subtitle">お疲れ様でした</p>
+      ${statusBanner}
+      <div class="info-box">
+        <strong>学号：</strong>${escHtml(state.studentId)}<br>
+        <strong>姓名：</strong>${escHtml(state.name)}
+      </div>
+      <div class="score-total">
+        <div class="st-label">合計得点</div>
+        <div class="st-val">${total}<span class="st-denom">/25</span></div>
+      </div>
+      <div class="score-grid">${scoreGrid}</div>
+      ${reviewSections}
+      <button class="btn-primary" onclick="resetAll()">最初からやり直す</button>
+    </div>
+  `;
+}
+
+// ===================== UTILS =====================
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+function resetAll() {
+  Object.assign(state, {
+    screen: "register", studentId: "", name: "",
+    sectionIdx: 0, questionIdx: 0,
+    answers: [[], [], []], scoreResult: null, submitError: false
+  });
+  render();
+}
+
+// ===================== INIT =====================
+render();
+</script>
+</body>
+</html>
